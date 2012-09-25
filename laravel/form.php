@@ -51,13 +51,13 @@ class Form {
 	 * @param  bool     $https
 	 * @return string
 	 */
-	public static function open($action = null, $method = 'POST', $attributes = array(), $https = null)
+	public static function open($action = null, $method = 'POST', $attributes = array(), $https = null, $javascript = null)
 	{
 		$method = strtoupper($method);
 
 		$attributes['method'] =  static::method($method);
 
-		$attributes['action'] = static::action($action, $https);
+		$attributes['action'] = static::action($action, $https, $javascript);
 
 		// If a character encoding has not been specified in the attributes, we will
 		// use the default encoding as specified in the application configuration
@@ -100,11 +100,31 @@ class Form {
 	 * @param  bool     $https
 	 * @return string
 	 */
-	protected static function action($action, $https)
+	protected static function action($action, $https, $javascript)
 	{
 		$uri = (is_null($action)) ? URI::current() : $action;
 
-		return HTML::entities(URL::to($uri, $https));
+		if ($javascript)
+		{
+			return $uri;
+		}
+		else
+		{
+			return HTML::entities(URL::to($uri, $https));
+		}
+	}
+
+	/**
+	 * Open a HTML form without prepending the base URI to action.
+	 *
+	 * @param  string  $action
+	 * @param  string  $method
+	 * @param  array   $attributes
+	 * @return string
+	 */
+	public static function open_javascript($action = null, $method = 'POST', $attributes = array())
+	{
+		return static::open($action, $method, $attributes, null, true);
 	}
 
 	/**
